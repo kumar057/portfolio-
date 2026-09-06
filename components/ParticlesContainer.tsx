@@ -1,8 +1,7 @@
 "use client";
 
-import Particles, { ParticlesProvider } from "@tsparticles/react";
-import type { Engine, ISourceOptions } from "@tsparticles/engine";
-import { loadFull } from "tsparticles";
+import Particles, { useParticlesProvider } from "@tsparticles/react";
+import type { ISourceOptions } from "@tsparticles/engine";
 
 const particlesOptions: ISourceOptions = {
   fullScreen: { enable: false },
@@ -81,19 +80,21 @@ const particlesOptions: ISourceOptions = {
   detectRetina: true,
 };
 
-const initParticles = async (engine: Engine) => {
-  await loadFull(engine);
-};
-
 const ParticlesContainer = () => {
+  // The engine is initialized once at the app root (see layout.tsx) so that
+  // navigating between pages never re-triggers initialization — doing that
+  // inside a component that mounts/unmounts on every page visit is what
+  // caused crashes that froze the rest of the page's animations.
+  const { loaded } = useParticlesProvider();
+
+  if (!loaded) return null;
+
   return (
-    <ParticlesProvider init={initParticles}>
-      <Particles
-        className="w-full h-full absolute translate-z-0 pointer-events-none"
-        id="tsparticles"
-        options={particlesOptions}
-      />
-    </ParticlesProvider>
+    <Particles
+      className="w-full h-full absolute translate-z-0 pointer-events-none"
+      id="tsparticles"
+      options={particlesOptions}
+    />
   );
 };
 
