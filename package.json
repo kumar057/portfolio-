@@ -1,0 +1,80 @@
+{
+  "name": "modern-portfolio",
+  "version": "1.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@tsparticles/engine": "^4.3.2",
+    "@tsparticles/react": "^4.3.2",
+    "framer-motion": "^13.1.1",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-countup": "^6.4.2",
+    "react-dom": "19.2.8",
+    "react-google-recaptcha-v3": "^1.11.0",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.7.0",
+    "resend": "^6.25.0",
+    "swiper": "^14.2.0",
+    "tsparticles": "^4.3.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.4",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  },
+  "author": {
+    "name": "Sanidhya Kumar Verma",
+    "email": "sanidhyyy@gmail.com",
+    "url": "https://github.com/sanidhyy"
+  },
+  "description": "Ethan Smith is a Full-stack web developer with 10+ years of experience.",
+  "keywords": [
+    "react",
+    "next",
+    "nextjs",
+    "typescript",
+    "html",
+    "css",
+    "tailwindcss",
+    "modern-ui",
+    "modern-ux",
+    "portfolio",
+    "framer-motion",
+    "react-hot-toast",
+    "resend",
+    "3d-website",
+    "particle-effect"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanidhyy/modern-portfolio.git"
+  },
+  "homepage": "https://github.com/sanidhyy/modern-portfolio#readme",
+  "bugs": {
+    "url": "https://github.com/sanidhyy/modern-portfolio/issues",
+    "email": "sanidhyyy@gmail.com"
+  },
+  "funding": [
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/sanidhy"
+    },
+    {
+      "type": "Buy me a coffee",
+      "url": "https://www.buymeacoffee.com/sanidhy"
+    }
+  ]
+}
