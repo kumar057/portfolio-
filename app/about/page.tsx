@@ -11,9 +11,9 @@ import {
   FaJs,
   FaPython,
   FaReact,
+  FaRobot,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
-import { SiOpenai } from "react-icons/si";
 
 import Avatar from "@/components/Avatar";
 import Circles from "@/components/Circles";
@@ -44,7 +44,7 @@ const aboutData: AboutDataItem[] = [
       },
       {
         title: "Generative AI & LLMs",
-        icons: [SiOpenai],
+        icons: [FaRobot],
       },
       {
         title: "Currently learning",
