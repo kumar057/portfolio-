@@ -78,20 +78,32 @@ const Avatar = () => {
         aria-hidden
       />
 
-      {/* Slowly rotating gradient ring around the photo */}
-      <motion.div
-        className="absolute inset-0 m-auto w-[92%] h-[92%] rounded-full"
-        style={{
-          background:
-            "conic-gradient(from 0deg, transparent, var(--color-accent), transparent 40%)",
-          WebkitMask:
-            "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))",
-          mask: "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))",
-        }}
-        animate={prefersReducedMotion ? undefined : { rotate: 360 }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      {/* Ring around the photo — draws itself in once on load, from 0% to
+          100%, starting at the top and sweeping around. Implemented as an
+          SVG stroke (pathLength animation) instead of a rotating masked
+          gradient, since that's the reliable, flicker-free way to do a true
+          reveal animation across both desktop and mobile browsers. */}
+      <svg
+        className="absolute inset-0 m-auto w-[92%] h-[92%] -rotate-90"
+        viewBox="0 0 100 100"
         aria-hidden
-      />
+      >
+        <motion.circle
+          cx="50"
+          cy="50"
+          r="47"
+          fill="none"
+          stroke="var(--color-accent)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          initial={prefersReducedMotion ? undefined : { pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{
+            pathLength: { duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 0.6 },
+            opacity: { duration: 0.4, delay: 0.6 },
+          }}
+        />
+      </svg>
 
       {/* Soft grounded shadow beneath the photo, breathing opposite the float */}
       <motion.div
