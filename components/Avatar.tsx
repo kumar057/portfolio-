@@ -1,46 +1,123 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 
 const Avatar = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Raw pointer position relative to the avatar's center, in -1..1 range.
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+
+  // Smooth the raw values so the tilt eases rather than snapping.
+  const smoothX = useSpring(pointerX, { stiffness: 120, damping: 20 });
+  const smoothY = useSpring(pointerY, { stiffness: 120, damping: 20 });
+
+  // Map pointer position to a subtle 3D tilt.
+  const rotateX = useTransform(smoothY, [-1, 1], [8, -8]);
+  const rotateY = useTransform(smoothX, [-1, 1], [-8, 8]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const el = containerRef.current;
+      if (!el) return;
+
+      const rect = el.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      // Only react while the cursor is reasonably close to the photo, so it
+      // doesn't tilt from mouse movement clear across the page.
+      const rangeX = rect.width;
+      const rangeY = rect.height;
+
+      pointerX.set(Math.max(-1, Math.min(1, (e.clientX - centerX) / rangeX)));
+      pointerY.set(Math.max(-1, Math.min(1, (e.clientY - centerY) / rangeY)));
+    };
+
+    const resetPointer = () => {
+      pointerX.set(0);
+      pointerY.set(0);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerleave", resetPointer);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerleave", resetPointer);
+    };
+  }, [pointerX, pointerY, prefersReducedMotion]);
+
   return (
-    <div className="hidden xl:flex xl:max-w-none pointer-events-none select-none relative">
+    <div
+      ref={containerRef}
+      className="hidden xl:flex xl:max-w-none pointer-events-none select-none relative"
+      style={{ perspective: 1200 }}
+    >
       {/* Glowing aura behind the photo — pulses continuously */}
       <motion.div
         className="absolute inset-0 m-auto w-3/4 h-3/4 rounded-full bg-accent/30 blur-3xl"
-        animate={{
-          scale: [1, 1.15, 1],
-          opacity: [0.35, 0.55, 0.35],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        animate={
+          prefersReducedMotion
+            ? undefined
+            : { scale: [1, 1.15, 1], opacity: [0.35, 0.55, 0.35] }
+        }
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden
       />
 
-      {/* Slowly rotating ring outline around the photo */}
+      {/* Slowly rotating gradient ring around the photo */}
       <motion.div
-        className="absolute inset-0 m-auto w-[92%] h-[92%] rounded-full border-2 border-dashed border-accent/40"
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 24,
-          repeat: Infinity,
-          ease: "linear",
+        className="absolute inset-0 m-auto w-[92%] h-[92%] rounded-full"
+        style={{
+          background:
+            "conic-gradient(from 0deg, transparent, var(--color-accent), transparent 40%)",
+          WebkitMask:
+            "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))",
+          mask: "radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px))",
         }}
+        animate={prefersReducedMotion ? undefined : { rotate: 360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
         aria-hidden
       />
 
-      {/* The photo itself, gently floating up and down forever */}
+      {/* Soft grounded shadow beneath the photo, breathing opposite the float */}
       <motion.div
-        animate={{ y: [0, -18, 0] }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 w-2/3 h-8 rounded-full bg-black/40 blur-2xl"
+        animate={
+          prefersReducedMotion
+            ? undefined
+            : { scaleX: [1, 0.75, 1], opacity: [0.5, 0.25, 0.5] }
+        }
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      />
+
+      {/* The photo itself: floats continuously and tilts toward the cursor */}
+      <motion.div
+        style={{
+          rotateX: prefersReducedMotion ? 0 : rotateX,
+          rotateY: prefersReducedMotion ? 0 : rotateY,
+          transformStyle: "preserve-3d",
         }}
+        animate={
+          prefersReducedMotion
+            ? undefined
+            : { y: [0, -18, 0], scale: [1, 1.02, 1] }
+        }
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         className="relative w-full h-full"
       >
         <Image
@@ -48,6 +125,7 @@ const Avatar = () => {
           alt="avatar"
           width={737}
           height={678}
+          priority
           className="translate-z-0 w-full h-full"
         />
       </motion.div>
