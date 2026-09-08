@@ -1,7 +1,9 @@
 "use client";
 
-import Particles, { useParticlesProvider } from "@tsparticles/react";
-import type { ISourceOptions } from "@tsparticles/engine";
+import { useEffect, useRef, useState } from "react";
+import { tsParticles } from "@tsparticles/engine";
+import type { Container, ISourceOptions } from "@tsparticles/engine";
+import { loadFull } from "tsparticles";
 
 const particlesOptions: ISourceOptions = {
   fullScreen: { enable: false },
@@ -80,20 +82,65 @@ const particlesOptions: ISourceOptions = {
   detectRetina: true,
 };
 
-const ParticlesContainer = () => {
-  // The engine is initialized once at the app root (see layout.tsx) so that
-  // navigating between pages never re-triggers initialization — doing that
-  // inside a component that mounts/unmounts on every page visit is what
-  // caused crashes that froze the rest of the page's animations.
-  const { loaded } = useParticlesProvider();
+// Loads the tsParticles plugin set exactly once for the whole app lifetime.
+// We talk to the core engine directly (skipping @tsparticles/react's
+// ParticlesProvider) because that wrapper calls React's createContext() at
+// module-import time, which breaks Next.js's build-time page-data collection
+// when imported anywhere in the app. The core engine below is plain JS with
+// no such issue, and this pattern is also naturally safe to call again if
+// this component remounts when navigating back to the page.
+let engineReady: Promise<void> | null = null;
+const ensureEngineReady = () => {
+  if (!engineReady) {
+    engineReady = loadFull(tsParticles);
+  }
+  return engineReady;
+};
 
-  if (!loaded) return null;
+const ParticlesContainer = () => {
+  const [ready, setReady] = useState(false);
+  const containerRef = useRef<Container | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    ensureEngineReady()
+      .then(() => {
+        if (!cancelled) setReady(true);
+      })
+      .catch(() => {
+        // Decorative background only — fail silently so the rest of the
+        // page keeps working even if particles can't load.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    let cancelled = false;
+
+    tsParticles
+      .load({ id: "tsparticles", options: particlesOptions })
+      .then((container) => {
+        if (cancelled || !container || container.destroyed) return;
+        containerRef.current = container;
+      });
+
+    return () => {
+      cancelled = true;
+      containerRef.current?.destroy();
+      containerRef.current = undefined;
+    };
+  }, [ready]);
 
   return (
-    <Particles
-      className="w-full h-full absolute translate-z-0 pointer-events-none"
+    <div
       id="tsparticles"
-      options={particlesOptions}
+      className="w-full h-full absolute translate-z-0 pointer-events-none"
     />
   );
 };
