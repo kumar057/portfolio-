@@ -146,6 +146,13 @@ const Avatar = () => {
           height={678}
           priority
           className="translate-z-0 w-full h-full object-cover"
+          style={{
+            // The source photo is a tall portrait (1122x1402) being cropped
+            // into a square circle. Default center-crop trims evenly from
+            // top and bottom; biasing toward the top keeps the face fully
+            // in frame instead of risking any of it being cropped off.
+            objectPosition: "50% 12%",
+          }}
         />
       </motion.div>
     </div>
