@@ -139,6 +139,17 @@ const Avatar = () => {
           height={678}
           priority
           className="translate-z-0 w-full h-full"
+          style={{
+            // Soft edge fade so the decorative lines/dots drawn inside the
+            // artwork blend into the background instead of ending abruptly
+            // at the photo's border. Stays fully solid through the face and
+            // only fades out right at the outer edge, lining up with the
+            // ring around the photo.
+            WebkitMaskImage:
+              "radial-gradient(circle, #000 75%, rgba(0,0,0,0.85) 85%, transparent 98%)",
+            maskImage:
+              "radial-gradient(circle, #000 75%, rgba(0,0,0,0.85) 85%, transparent 98%)",
+          }}
         />
       </motion.div>
     </div>
