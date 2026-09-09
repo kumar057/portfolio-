@@ -99,8 +99,12 @@ const Avatar = () => {
           initial={prefersReducedMotion ? undefined : { pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
           transition={{
-            pathLength: { duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 0.6 },
-            opacity: { duration: 0.4, delay: 0.6 },
+            // Starts once the photo itself has finished fading onto the
+            // page (the page's own entrance animation takes about 1s), so
+            // the ring reads as a follow-up to the page loading in, rather
+            // than a separate animation running on its own timeline.
+            pathLength: { duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 1 },
+            opacity: { duration: 0.4, delay: 1 },
           }}
         />
       </svg>
