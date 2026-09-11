@@ -66,10 +66,9 @@ const Avatar = () => {
       className="hidden xl:flex xl:max-w-none pointer-events-none select-none relative"
       style={{ perspective: 1200 }}
     >
-      {/* Glowing aura behind the photo — pulses continuously, sized to
-          form a soft halo in the gap between the round photo and the ring */}
+      {/* Glowing aura behind the photo — pulses continuously */}
       <motion.div
-        className="absolute inset-0 m-auto w-[88%] aspect-square rounded-full bg-accent/30 blur-3xl"
+        className="absolute inset-0 m-auto w-3/4 h-3/4 rounded-full bg-accent/30 blur-3xl"
         animate={
           prefersReducedMotion
             ? undefined
@@ -112,7 +111,7 @@ const Avatar = () => {
 
       {/* Soft grounded shadow beneath the photo, breathing opposite the float */}
       <motion.div
-        className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-1/2 h-6 rounded-full bg-black/40 blur-2xl"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 w-2/3 h-8 rounded-full bg-black/40 blur-2xl"
         animate={
           prefersReducedMotion
             ? undefined
@@ -122,9 +121,10 @@ const Avatar = () => {
         aria-hidden
       />
 
-      {/* The photo itself: a clean round crop, floating continuously and
-          tilting toward the cursor. Sized to sit just inside the ring,
-          with the glow halo filling the gap between the two. */}
+      {/* The photo itself: shown in its natural square/rectangular shape
+          (uncropped), floating continuously and tilting toward the
+          cursor. A soft edge fade blends the artwork's decorative lines
+          into the background instead of cutting them off abruptly. */}
       <motion.div
         style={{
           rotateX: prefersReducedMotion ? 0 : rotateX,
@@ -137,7 +137,7 @@ const Avatar = () => {
             : { y: [0, -18, 0], scale: [1, 1.02, 1] }
         }
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 m-auto w-[78%] aspect-square rounded-full overflow-hidden shadow-2xl ring-1 ring-white/10"
+        className="relative w-full h-full"
       >
         <Image
           src="/avatar.png"
@@ -145,13 +145,12 @@ const Avatar = () => {
           width={737}
           height={678}
           priority
-          className="translate-z-0 w-full h-full object-cover"
+          className="translate-z-0 w-full h-full"
           style={{
-            // The source photo is a tall portrait (1122x1402) being cropped
-            // into a square circle. Default center-crop trims evenly from
-            // top and bottom; biasing toward the top keeps the face fully
-            // in frame instead of risking any of it being cropped off.
-            objectPosition: "50% 12%",
+            WebkitMaskImage:
+              "radial-gradient(circle, #000 75%, rgba(0,0,0,0.85) 85%, transparent 98%)",
+            maskImage:
+              "radial-gradient(circle, #000 75%, rgba(0,0,0,0.85) 85%, transparent 98%)",
           }}
         />
       </motion.div>
